@@ -1,0 +1,9 @@
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\bin\Release\PortableDriver.exe.config
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\bin\Release\PortableDriver.exe
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\bin\Release\PortableDriver.pdb
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Release\PortableDriver.Form1.resources
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Release\PortableDriver.Properties.Resources.resources
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Release\PortableDriver.csproj.GenerateResource.cache
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Release\PortableDriver.csproj.CoreCompileInputs.cache
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Release\PortableDriver.exe
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Release\PortableDriver.pdb
