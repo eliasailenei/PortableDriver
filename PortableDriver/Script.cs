@@ -9,10 +9,10 @@ namespace PortableDriver
 {
    public class Script
     {
-        protected string xmlLoc;
+        public string xmlLoc;
         protected string[] arrUrl;
         public Script() { 
-        xmlLoc = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        xmlLoc = Environment.GetFolderPath(Environment.SpecialFolder.System);
         }
         public Script(string xmlLoc)
         {

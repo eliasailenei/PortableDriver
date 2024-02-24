@@ -9,13 +9,6 @@ namespace PortableDriver
     class Program
     {
         private string[] args;
-
-        [DllImport("kernel32.dll")]
-       private static extern bool AllocConsole();
-
-       [DllImport("kernel32.dll")]
-        private static extern bool FreeConsole();
-
         [STAThread]
         static void Main(string[] args)
         {
@@ -31,33 +24,40 @@ namespace PortableDriver
             } catch {
                 Console.WriteLine("GekoDriver isn't running already.");
             }
+            try
+            {
+                if (args[0] == "--test")
+                {
+                    Application.SetCompatibleTextRenderingDefault(false); 
+                    Form1 form = new Form1(true);
+                    Application.EnableVisualStyles();
+                    Application.Run(form);
+                }
+                else if (args[0] == "--installer")
+                {
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new Installer(args[1]));
+                }
+                else
+                {
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new Form1(false));
+                }
+            } catch {
+                
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new Form1(false));
+                
+            }
             
-            // Pass args to the constructor
-            Program program = new Program(args);
-            if (program.issCLI()) // Call issCLI() on an instance of Program
-            {
-                AllocConsole();
-                Form1 form = new Form1();
-                form.isCLI = true;
-                form.Show();
-                 FreeConsole();
-            }
-            else
-            {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new Form1());
-            }
         }
 
         public Program(string[] args)
         {
             this.args = args;
-        }
-
-        private bool issCLI()
-        {
-            return args.Length > 0 && args[0] == "-test";
         }
         
     }

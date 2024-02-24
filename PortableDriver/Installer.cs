@@ -12,6 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.Net.NetworkInformation;
+using System.Security.Policy;
 
 namespace PortableDriver
 {
@@ -27,19 +29,47 @@ namespace PortableDriver
         List<string> downlFile = new List<string>(); 
         XmlDocument xmlDoc = new XmlDocument();
 
+        public Installer(string accXml)
+        {
+            InitializeComponent();
+            if (Directory.Exists(accXml))
+            {
+                xmlPath = accXml;
+            } else
+            {
+                MessageBox.Show("Invalid script. Try again!");
+                this.Close();
+            }
+            
+        }
         public Installer()
         {
             InitializeComponent();
         }
-
         private async void Installer_Load(object sender, EventArgs e)
         {
-            showAll(false);
+            string[] placehold = { "n/a" };
+            while (internetStatus())
+            {
+                label1.Text = "No internet, please try again";
+                showAll(false);
+            }
             await loadXML();
             pictureBox1.Hide();
             label1.Visible = false;
             showAll(true);
-            await startDown();
+            await startDown(xmlPath + "\\DriverSetup\\", false, placehold);
+            foreach (var item in found)
+            {
+                if (item.Item2 == "Setup")
+                {
+                    string app = item.Item3;
+                    string args = item.Item4;
+                    niniteInstall(app, args);
+                    break; 
+                }
+            }
+            this.Close();   
         }
 
         private void showAll(bool inp)
@@ -48,35 +78,57 @@ namespace PortableDriver
             label3.Visible = inp;
             label4.Visible = inp;
             label5.Visible = inp;
+            label6.Visible = inp;
             pictureBox2.Visible = inp;
             pictureBox3.Visible = inp;
             pictureBox4.Visible = inp;
             progressBar1.Visible = inp;
             button1.Visible = inp;
         }
-
+        public bool internetStatus()
+        {
+            try
+            {
+                using (var ping = new Ping())
+                {
+                    var result = ping.Send("www.google.com");
+                    return result.Status == IPStatus.Success;
+                }
+            }
+            catch (PingException)
+            { 
+                return false;
+            }
+        }
         private async Task loadXML()
         {
             await Task.Run(() =>
             {
-                xmlDoc.Load(xmlPath + "\\autoDriver.xml");
-
-                XmlNodeList scriptNodes = xmlDoc.SelectNodes("//Script");
-
-                foreach (XmlNode scriptNode in scriptNodes)
+                try
                 {
-                    int order = int.Parse(scriptNode.SelectSingleNode("Order").InnerText);
-                    string type = scriptNode.SelectSingleNode("Type").InnerText;
-                    string url = scriptNode.SelectSingleNode("URL").InnerText;
-                    string args = scriptNode.SelectSingleNode("Args").InnerText;
+                    xmlDoc.Load(xmlPath + "\\autoDriver.xml");
 
-                    found.Add(new Tuple<int, string, string, string>(order, type, url, args));
+                    XmlNodeList scriptNodes = xmlDoc.SelectNodes("//Script");
+
+                    foreach (XmlNode scriptNode in scriptNodes)
+                    {
+                        int order = int.Parse(scriptNode.SelectSingleNode("Order").InnerText);
+                        string type = scriptNode.SelectSingleNode("Type").InnerText;
+                        string url = scriptNode.SelectSingleNode("URL").InnerText;
+                        string args = scriptNode.SelectSingleNode("Args").InnerText;
+
+                        found.Add(new Tuple<int, string, string, string>(order, type, url, args));
+                    }
+                } catch (Exception ex)
+                {
+                    MessageBox.Show(xmlPath + " is not a real path. Try again using speech marks. Here is error code:" +ex.Message);
                 }
+               
             });
         }
-        private async Task startDown()
+        public async Task startDown(string path, bool isPort, string[] arrinpt)
         {
-            downloc = xmlPath + "\\DriverSetup\\";
+            downloc = path;
             pictureBox3.Hide();
             pictureBox4.Hide();
             await Task.Run(() =>
@@ -87,6 +139,15 @@ namespace PortableDriver
                     Directory.Delete(downloc, true);
                 }
                 Directory.CreateDirectory(downloc);
+                if (isPort)
+                {
+                    found.Clear();
+                    foreach (string str in arrinpt)
+                    {
+                        found.Add(new Tuple<int, string, string, string>(0, "n/a", "n/a", str));
+
+                    }
+                }
                 foreach (var item in found)
                 {
                     string url = item.Item3;
@@ -116,13 +177,31 @@ namespace PortableDriver
                         // Handle unsupported file types
                     }
                     pointer++;
-                    UpdateLabel($"Downloaded {pointer}/{found.Count}");
+                    if (!isPort)
+                    {
+                        UpdateLabel($"Downloaded {pointer}/{found.Count}");
+                    }
+                    
                 }
-                findDriver();
-                installDrivers();
+                if (!isPort)
+                {
+                    findDriver();
+                    installDrivers();
+                }
+                
             });
         }
-
+        private async void niniteInstall(string apps, string argss)
+        {
+            await Task.Run(() =>
+            {
+                pictureBox2.BeginInvoke(new Action(() => { pictureBox2.Visible = false; }));
+                pictureBox4.BeginInvoke(new Action(() => { pictureBox4.Visible = false; }));
+                pictureBox3.BeginInvoke(new Action(() => { pictureBox3.Visible = true; }));
+                string folderPath = Path.GetDirectoryName(apps);
+                Process.Start(apps, folderPath + "\\" +argss);
+            });
+        }
         private void UpdateLabel(string text)
         {
             if (label6.InvokeRequired)
@@ -270,21 +349,61 @@ namespace PortableDriver
             }
             catch (UnauthorizedAccessException)
             {
-                MessageBox.Show("error");
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            List<Form> formsToClose = new List<Form>();
+            foreach (Form form in Application.OpenForms)
+            {
+                formsToClose.Add(form);
+            }
+            foreach (Form form in formsToClose)
+            {
+                form.Close();
+            }
+        }
+
         private void installDrivers()
         {
-            Process pro = new Process();
-            foreach (string url in downlFile)
+            try
             {
-               pro.StartInfo.FileName = url;
-                pro.Start();
-                pro.WaitForExit();
+                label6.BeginInvoke(new Action(() => label6.Text = "Installing now"));
+                progressBar1.BeginInvoke(new Action(() => {
+                    progressBar1.Minimum = 0;
+                    progressBar1.Maximum = downlFile.Count;
+                }));
+
+                int point = 1;
+                foreach (string url in downlFile)
+                {
+                    label6.BeginInvoke(new Action(() => label6.Text = $"Installing {point}/{downlFile.Count}"));
+                    progressBar1.BeginInvoke(new Action(() => progressBar1.Value = point));
+
+                    Process pro = new Process();
+                    pro.StartInfo.FileName = url;
+                    pro.Start();
+                    pro.WaitForExit();
+
+                    point++;
+                }
+
+                
+            } catch
+            {
+                Console.WriteLine("Error is ignored");
+            }
+            finally
+            {
+                label6.BeginInvoke(new Action(() => label6.Text = "Installation completed"));
+                progressBar1.BeginInvoke(new Action(() => progressBar1.Style = ProgressBarStyle.Marquee));
             }
             
         }
 
-        
+
+
+
     }
 }

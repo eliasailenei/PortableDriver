@@ -47,3 +47,5 @@ C:\Users\remus\source\repos\PortableDriver\PortableDriver\bin\Debug\nunit.framew
 C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Debug\PortableDriver.Installer.resources
 C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Debug\PortableDriver.Settings.resources
 C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Debug\PortableDriver.ModelSelect.resources
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Debug\PortableDriver.NotFound.resources
+C:\Users\remus\source\repos\PortableDriver\PortableDriver\obj\Debug\PortableDriver.PreDownload.resources

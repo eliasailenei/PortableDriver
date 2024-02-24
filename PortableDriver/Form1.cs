@@ -1,35 +1,74 @@
 ﻿using PortableDriver.Properties;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection.Emit;
 using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.IO.Compression;
+using System.Net;
+using System.Linq;
 
 namespace PortableDriver
 {
     public partial class Form1 : Form
     {
+        public bool port, init, userDetermined, selector;
         Drivers drivers = new Drivers();
+        private Rectangle richb1, richb2, richb3,checb1, bttn1, bttn2, bttn3, bttn4, bttn5;
+        private Size form;
         MakeXML xML = new MakeXML();
         string seletetedURL;
         string[] deviceInfo;
-        bool init;
+        char tLetter;
+        string inpt;
         List<Tuple<string, string, string>> input;
         private List<string> downUrl = new List<string>();
-        public bool isCLI { get; set; }
-
-        public Form1()
+        private List<string> downPort = new List<string>();
+        public Form1(bool fs)
         {
             InitializeComponent();
-           
-        }
-        private async void Form1_Load(object sender, EventArgs e)
-        {
+            richTextBox3.Visible = false;
+            button4.Visible = false;
             
+            if (fs)
+            {
+                FormBorderStyle = FormBorderStyle.None;
+                WindowState = FormWindowState.Maximized;
+                this.Resize += Rsize;
+                form = this.Size;
+                this.BackColor = Color.Gray;
+                richTextBox3.Visible = true;
+                button4.Visible = true;
+                port = fs;
+            }
+            else
+            {
+                this.Resize += Rsize;
+                form = this.Size;
+                richTextBox3.Visible = false;
+                button4.Visible = false;
+                port = fs;
+            }
+            richb1 = new Rectangle(richTextBox1.Location, richTextBox1.Size);
+            richb2 = new Rectangle(richTextBox2.Location, richTextBox2.Size);
+            richb3 = new Rectangle(richTextBox3.Location, richTextBox3.Size);
+            checb1 = new Rectangle(checkedListBox1.Location, checkedListBox1.Size);
+            bttn1 = new Rectangle(button1.Location, button1.Size);
+            bttn2 = new Rectangle(button2.Location, button2.Size);
+            bttn3 = new Rectangle(button3.Location, button3.Size);
+            bttn4 = new Rectangle(button4.Location, button4.Size);
+            bttn5 = new Rectangle(button5.Location, button5.Size);
         }
-        private async void load()
+        private  void Form1_Load(object sender, EventArgs e)
+        {
+            // Due to UI conflict, Ive decieded to not use this method.
+        }
+        private async Task load()
         {
             if (deviceInfo[0].ToLower().Contains("asus"))
             {
@@ -39,7 +78,14 @@ namespace PortableDriver
             else if (deviceInfo[0].ToLower().Contains("micro-star") || deviceInfo[0].ToLower().Contains("micro star") || deviceInfo[0].ToLower().Contains("msi"))
             {
                 MSI msi = new MSI();
-                msi.itemModel(null);
+                if (userDetermined)
+                {
+                    msi.itemModel(inpt);
+                } else
+                {
+                    msi.itemModel(null);
+                }
+                
                 string pls = await msi.getUrl();
                 if (pls == "not-found!")
                 {
@@ -60,13 +106,35 @@ namespace PortableDriver
             }
             else
             {
-                MessageBox.Show("Program does not support your manufacture yet. Request it in the GitHub!");
+                NotFound showDiag = new NotFound();
+                int centerX = (Screen.PrimaryScreen.Bounds.Width - showDiag.Width) / 2;
+                int centerY = (Screen.PrimaryScreen.Bounds.Height - showDiag.Height) / 2;
+                showDiag.Location = new Point(centerX, centerY);
+                this.Controls.Add(showDiag);
+                showDiag.BringToFront();
+                showDiag.Show();
+                showDiag.InteractionComplete += async (s, args) =>
+                {
+                    userDetermined = true;
+                    inpt = showDiag.info;
+                    deviceInfo[0] = showDiag.manu;
+                    await load();
+                };
             }
         }
-       
+
+        
         private async Task asusLoad()
         {
-            Asus asus = new Asus();
+            Asus asus;
+            if (userDetermined)
+            {
+                asus = new Asus(inpt);
+            }
+            else
+            {
+                asus = new Asus();
+            }
             input = await asus.scrapeURL();
             Dictionary<string, string> latestVersions = new Dictionary<string, string>();
             foreach (Tuple<string, string, string> item in input)
@@ -143,18 +211,90 @@ namespace PortableDriver
             return first.Replace("DOWNLOAD", "");
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (selector)
+            {
+                selector = false;
+                button4.Text = "Turn ON Selector";
+            } else if (!selector)
+            {
+                selector= true;
+                button4.Text = "Turn OFF Selector";
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Invoke((Action)(() =>
+                {
+                    var openForms = System.Windows.Forms.Application.OpenForms.Cast<Form>().ToList();
+
+                    foreach (Form form in openForms)
+                    {
+                        form.Close();
+                    }
+                }));
+            }
+            catch (InvalidOperationException)
+            {
+            }
+            finally
+            {
+                MessageBox.Show("DONE");
+            }
+
+        }
+
+        private void checkedListBox1_DoubleClick(object sender, EventArgs e)
+        {
+            
+            if (checkedListBox1.SelectedItem != null)
+            {
+                string selectedItem = checkedListBox1.SelectedItem.ToString();
+
+                if (port && selector)
+                {
+                    if (!downPort.Contains(selectedItem))
+                    {
+                        downPort.Add(selectedItem);
+                        showText();
+                        checkedListBox1.SetItemChecked(checkedListBox1.SelectedIndex, false);
+                    } else if (downPort.Contains(selectedItem))
+                    {
+                        downPort.Remove(selectedItem);
+                        showText();
+                        checkedListBox1.SetItemChecked(checkedListBox1.SelectedIndex, true);
+                    }
+                }
+                
+            }
+        }
+
+
+        private async void button1_Click(object sender, EventArgs e)
         {
             checkedListBox1.Items.Clear(); 
             for (int i = 0; i < checkedListBox1.Items.Count; i++)
             {
                 checkedListBox1.SetItemChecked(i, false); 
            }
-            load();
-           
+            await load();
+            Cursor.Current = Cursors.Arrow;
+
         }
 
-        
+        private void showText()
+        {
+            richTextBox3.Clear();
+            richTextBox3.AppendText("The following is going to be pre-installed:\n");
+            foreach (string item in downPort)
+            {
+                richTextBox3.AppendText("- "+item + "\n");
+            }
+        }
 
         private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
         {
@@ -183,20 +323,85 @@ namespace PortableDriver
 
         private void button2_Click(object sender, EventArgs e)
         {
-            int point =0 ;
-            foreach (string url in downUrl)
+            if (port)
             {
-                if (!string.IsNullOrEmpty(url))
+                int pointer = 0;
+                string[] urls = new string[downPort.Count]; 
+
+                foreach (string item in downPort)
                 {
-                    xML.addToXML(point, "Driver", url, "/SILENT /NORESTART");
-                    point++;
+                    if (deviceInfo[0].ToLower().Contains("asus"))
+                    {
+                        string modifiedItem = "DOWNLOAD" + item;
+                        int commaIndex = modifiedItem.IndexOf(',');
+                        string updatedItem = commaIndex != -1 ? modifiedItem.Substring(0, commaIndex) : modifiedItem;
+                        foreach (var main in input)
+                        {
+                            if (main.Item1 == updatedItem)
+                            {
+                                urls[pointer] = main.Item2; 
+                                pointer++;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (var main in input)
+                        {
+                            if (main.Item1 == item)
+                            {
+                                urls[pointer] = main.Item2; 
+                                pointer++;
+                            }
+                        }
+                    }
+                
+
+                
                 }
+                PreDownload showDiag = new PreDownload();
+                showDiag.urlList = urls;
+                int centerX = (Screen.PrimaryScreen.Bounds.Width - showDiag.Width) / 2;
+                int centerY = (Screen.PrimaryScreen.Bounds.Height - showDiag.Height) / 2;
+                showDiag.Location = new Point(centerX, centerY);
+                this.Controls.Add(showDiag);
+                showDiag.BringToFront();
+                showDiag.Show();
+                showDiag.InteractionComplete += (s, args) =>
+                {
+                    int points = 0;
+                    foreach (string url in downUrl)
+                    {
+                        if (!string.IsNullOrEmpty(url))
+                        {
+                            xML.addToXML(points, "Driver", url, "/SILENT /NORESTART");
+                            points++;
+                        }
+                    }
+                    xML.addToXML(points + 1, "Setup", "C:\\Windows\\Setup\\setup.exe", "-noargs-");
+                    xML.compileScript();
+                    button5_Click(sender, e);
+                };
+
             }
-            xML.addToXML(point + 1, "Setup", "C:\\Windows\\Setup\\setup.exe", "-noargs-");
-            xML.compileScript();
-            Installer inst = new Installer();   
-            inst.xmlPath = xML.getXmlLoc();
-            inst.Show();
+            else
+            {
+                int point = 0;
+                foreach (string url in downUrl)
+                {
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        xML.addToXML(point, "Driver", url, "/SILENT /NORESTART");
+                        point++;
+                    }
+                }
+                xML.addToXML(point + 1, "Setup", "C:\\Windows\\Setup\\setup.exe", "-noargs-");
+                xML.compileScript();
+                Installer inst = new Installer(xML.getXmlLoc());
+                inst.Show();
+            }
+            
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -209,35 +414,95 @@ namespace PortableDriver
                                   (this.ClientSize.Height - settings.Height) / 2);
             settings.Visible = true;
         }
-
-        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void resizeControl(Rectangle r, Control c)
         {
+            float xRatio = (float)this.ClientSize.Width / form.Width;
+            float yRatio = (float)this.ClientSize.Height / form.Height;
 
+            int newX = (int)(r.X * xRatio);
+            int newY = (int)(r.Y * yRatio);
+
+            int newWidth = (int)(r.Width * xRatio);
+            int newHeight = (int)(r.Height * yRatio);
+
+            c.Location = new Point(newX, newY);
+            c.Size = new Size(newWidth, newHeight);
         }
-
+        
+        private void Rsize(object sender, EventArgs e)
+        {
+            resizeControl(bttn1, button1);
+            resizeControl(bttn2, button2);
+            resizeControl(bttn3, button3);
+            resizeControl(bttn4, button4);
+            resizeControl(bttn5, button5);
+            resizeControl(checb1, checkedListBox1);
+            resizeControl(richb1, richTextBox1);
+            resizeControl(richb2, richTextBox2);
+            resizeControl(richb3, richTextBox3);
+        }
         private void Form1_Shown(object sender, EventArgs e)
         {
-            propLoad();
-        }
-        private async void propLoad()
-        {
-            richTextBox2.AppendText("Please wait, we are loading your drivers now.");
-            if (isCLI)
+            if (port)
             {
-                CLI cLI = new CLI();
-                cLI.Main();
+                if (File.Exists(Environment.SystemDirectory + "\\driveLetters.txt"))
+                {
+                    string[] letters = File.ReadAllLines(Environment.SystemDirectory + "\\driveLetters.txt");
+                    if (letters.Length >= 2)
+                    {
+                        tLetter = letters[1][0];
+                    }
+                }
+                else
+                {
+                    tLetter = 'T';
+                }
             }
+            if (!Directory.Exists("drivers"))
+            {
+                GettingDrivers showDiag = new GettingDrivers();
+                int centerX = (Screen.PrimaryScreen.Bounds.Width - showDiag.Width) / 2;
+                int centerY = (Screen.PrimaryScreen.Bounds.Height - showDiag.Height) / 2;
+                showDiag.Location = new Point(centerX, centerY);
+                this.Controls.Add(showDiag);
+                showDiag.BringToFront();
+                showDiag.Show();
+                showDiag.InteractionComplete += (s, args) =>
+                {
+                   propLoad();
+                };
+            }
+            else
+            {
+                propLoad();
+            }
+            
+        }
+        private async Task propLoad()
+        {
+            richTextBox2.BeginInvoke((Action)(() => richTextBox2.AppendText("Please wait, we are loading your drivers now.")));
+
             deviceInfo = await drivers.Driver();
+
             string[] alsoDisplay = { "Manufacture:", "Product Name:", "Model:", "Serial Number:" };
             int point = 0;
             foreach (string info in deviceInfo)
             {
-                richTextBox1.AppendText($"{alsoDisplay[point]} {info}\n");
+                int temp = point;
+                richTextBox1.BeginInvoke((Action)(() => richTextBox1.AppendText($"{alsoDisplay[temp]} {info}\n")));
                 point++;
             }
-            load();
-            richTextBox2.Clear();
-            richTextBox2.AppendText("When you are ready, click the button below. This will create a script and install your programs.");
+
+            await load();
+
+            richTextBox2.BeginInvoke((Action)(() =>
+            {
+                richTextBox2.Clear();
+                richTextBox2.AppendText("-When you are ready, click the button below. This will create a script and install your programs.\n-Sometimes the program might show nothing, please rescan.");
+                if (port) richTextBox2.AppendText("\n-You are running via PortableISO! You can double click any text to pre-download the driver. For example, if you need the WiFi driver to connect to the internet.\n \n Hint: to select your pre-downloads, turn on selector!");
+                Cursor.Current = Cursors.Arrow;
+            }));
         }
+
     }
 }

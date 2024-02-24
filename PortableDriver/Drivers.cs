@@ -86,13 +86,23 @@ class Drivers
 }
 class Asus
 {
+    public string product;
+    public Asus()
+    {
+        product = globalVariables.results[2];
+    }
+    public Asus(string product)
+    {
+        this.product = product;
+    }
+
     private async Task<string> HTMLResponse()
     {
         using (HttpClient client = new HttpClient())
         {
             try
             {
-                HttpResponseMessage response = await client.GetAsync("https://www.asus.com/support/api/product.asmx/GetPDSupportTab?website=global&pdid=&pdhashedid=&model=" + removeDot(globalVariables.results[2]));
+                HttpResponseMessage response = await client.GetAsync("https://www.asus.com/support/api/product.asmx/GetPDSupportTab?website=global&pdid=&pdhashedid=&model=" + removeDot(product));
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -287,6 +297,7 @@ class MSI
     public async Task<List<Tuple<string, string, string>>> getDatas(string url)
     {
         string accUrl = url + "/support#driver";
+        // use real oop
         List<Tuple<string, string, string>> results = new List<Tuple<string, string, string>>();
         var driverService = FirefoxDriverService.CreateDefaultService(@"drivers\geckodriver.exe");
         driverService.HideCommandPromptWindow = true;
