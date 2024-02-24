@@ -20,11 +20,8 @@ namespace PortableDriver
     public partial class Installer : Form
     {
         public string xmlPath { get; set; }
-        static bool continueDlnd;
-        static string downloc;
-        static string ext;
-        string defPath;
-        bool silent, reboot;
+        static bool continueDlnd ,silent, reboot, isPre;
+        static string downloc,ext,defPath;
         List<Tuple<int, string, string, string>> found = new List<Tuple<int, string, string, string>>();
         List<string> downlFile = new List<string>(); 
         XmlDocument xmlDoc = new XmlDocument();
@@ -49,27 +46,42 @@ namespace PortableDriver
         private async void Installer_Load(object sender, EventArgs e)
         {
             string[] placehold = { "n/a" };
-            while (internetStatus())
+            if (Directory.Exists("PreDownloaded"))
+            {
+                isPre = true;
+                downloc = Path.Combine(Environment.CurrentDirectory, "PreDownloaded");
+                findDriver();
+                installDrivers();
+              Directory.Delete(downloc, true);
+                Application.Restart();
+                return;
+            }
+
+            if (internetStatus())
+            {
+                await loadXML();
+                pictureBox1.Hide();
+                label1.Visible = false;
+                showAll(true);
+                await startDown(xmlPath + "\\DriverSetup\\", false, placehold);
+                foreach (var item in found)
+                {
+                    if (item.Item2 == "Setup")
+                    {
+                        string app = item.Item3;
+                        string args = item.Item4;
+                        niniteInstall(app, args);
+                        break;
+                    }
+                }
+            }
+            else
             {
                 label1.Text = "No internet, please try again";
                 showAll(false);
             }
-            await loadXML();
-            pictureBox1.Hide();
-            label1.Visible = false;
-            showAll(true);
-            await startDown(xmlPath + "\\DriverSetup\\", false, placehold);
-            foreach (var item in found)
-            {
-                if (item.Item2 == "Setup")
-                {
-                    string app = item.Item3;
-                    string args = item.Item4;
-                    niniteInstall(app, args);
-                    break; 
-                }
-            }
-            this.Close();   
+
+            this.Close();
         }
 
         private void showAll(bool inp)
@@ -367,17 +379,27 @@ namespace PortableDriver
 
         private void installDrivers()
         {
-            try
+            int point = 1;
+            bool errorOccurred = false;
+            foreach (string url in downlFile)
             {
-                label6.BeginInvoke(new Action(() => label6.Text = "Installing now"));
-                progressBar1.BeginInvoke(new Action(() => {
-                    progressBar1.Minimum = 0;
-                    progressBar1.Maximum = downlFile.Count;
-                }));
-
-                int point = 1;
-                foreach (string url in downlFile)
+                try
                 {
+                    label6.BeginInvoke(new Action(() => label6.Text = "Installing now"));
+                    progressBar1.BeginInvoke(new Action(() =>
+                    {
+                        progressBar1.Minimum = 0;
+                        if (isPre)
+                        {
+                            progressBar1.Maximum = point + 1;
+                        }
+                        else
+                        {
+                            progressBar1.Maximum = downlFile.Count;
+                        }
+                    }));
+
+
                     label6.BeginInvoke(new Action(() => label6.Text = $"Installing {point}/{downlFile.Count}"));
                     progressBar1.BeginInvoke(new Action(() => progressBar1.Value = point));
 
@@ -387,23 +409,23 @@ namespace PortableDriver
                     pro.WaitForExit();
 
                     point++;
+
                 }
-
-                
-            } catch
-            {
-                Console.WriteLine("Error is ignored");
+                catch
+                {
+                    Console.WriteLine("Error is ignored");
+                    errorOccurred = true;
+                }
             }
-            finally
+            if (isPre)
             {
-                label6.BeginInvoke(new Action(() => label6.Text = "Installation completed"));
-                progressBar1.BeginInvoke(new Action(() => progressBar1.Style = ProgressBarStyle.Marquee));
+                progressBar1.Value = progressBar1.Minimum;
             }
-            
+            else
+            {
+                label6.BeginInvoke(new Action(() => label6.Text = errorOccurred ? "Installation failed" : "Installation completed"));
+                progressBar1.BeginInvoke(new Action(() => progressBar1.Style = errorOccurred ? ProgressBarStyle.Continuous : ProgressBarStyle.Marquee));
+            }
         }
-
-
-
-
     }
 }

@@ -370,6 +370,7 @@ namespace PortableDriver
                 showDiag.Show();
                 showDiag.InteractionComplete += (s, args) =>
                 {
+                    xML.xmlLoc = Directory.GetCurrentDirectory();
                     int points = 0;
                     foreach (string url in downUrl)
                     {
@@ -379,7 +380,7 @@ namespace PortableDriver
                             points++;
                         }
                     }
-                    xML.addToXML(points + 1, "Setup", "C:\\Windows\\Setup\\setup.exe", "-noargs-");
+                    xML.addToXML(points + 1, "Setup", "C:\\Windows\\Setup\\Scripts\\autorun.exe", "autorun.au3");
                     xML.compileScript();
                     button5_Click(sender, e);
                 };
