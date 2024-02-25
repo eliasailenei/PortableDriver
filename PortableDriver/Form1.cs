@@ -12,11 +12,33 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.IO.Compression;
 using System.Net;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace PortableDriver
 {
     public partial class Form1 : Form
     {
+        static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+
+        static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
+
+        static readonly IntPtr HWND_TOP = new IntPtr(0);
+
+        static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+
+        const UInt32 SWP_NOSIZE = 0x0001;
+
+        const UInt32 SWP_NOMOVE = 0x0002;
+
+        const UInt32 TOPMOST_FLAGS = SWP_NOMOVE | SWP_NOSIZE;
+
+
+
+        [DllImport("user32.dll")]
+
+        [return: MarshalAs(UnmanagedType.Bool)]
+
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
         public bool port, init, userDetermined, selector;
         Drivers drivers = new Drivers();
         private Rectangle richb1, richb2, richb3,checb1, bttn1, bttn2, bttn3, bttn4, bttn5;
@@ -31,6 +53,7 @@ namespace PortableDriver
         private List<string> downPort = new List<string>();
         public Form1(bool fs)
         {
+            SetWindowPos(this.Handle, HWND_TOPMOST, 0, 0, 0, 0, TOPMOST_FLAGS);
             InitializeComponent();
             richTextBox3.Visible = false;
             button4.Visible = false;

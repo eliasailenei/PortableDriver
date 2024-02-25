@@ -21,6 +21,13 @@ namespace PortableDriver
                 process.StartInfo.UseShellExecute = false;
                 process.Start();
                 process.WaitForExit();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.Arguments = "/c taskkill /f /im firefox.exe";
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.UseShellExecute = false;
+                process.Start();
+                process.WaitForExit();
+
             } catch {
                 Console.WriteLine("GekoDriver isn't running already.");
             }

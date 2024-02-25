@@ -46,10 +46,10 @@ namespace PortableDriver
         private async void Installer_Load(object sender, EventArgs e)
         {
             string[] placehold = { "n/a" };
-            if (Directory.Exists("PreDownloaded"))
+            if (Directory.Exists(xmlPath + "\\PreDownloaded"))
             {
                 isPre = true;
-                downloc = Path.Combine(Environment.CurrentDirectory, "PreDownloaded");
+                downloc = xmlPath + "\\PreDownloaded";
                 findDriver();
                 installDrivers();
               Directory.Delete(downloc, true);
