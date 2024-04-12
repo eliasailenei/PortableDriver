@@ -1,0 +1,137 @@
+<PortableDriver>
+  <Config>
+    <DefaultPath>C:\Windows\Setup</DefaultPath>
+    <RunSilent>True</RunSilent>
+    <RebootAfter>True</RebootAfter>
+  </Config>
+  <Scripts>
+    <MainScript>
+      <Script>
+        <Order>0</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Networking/28913/LAN_DCH_ROG_Intel_B_V12.19.2.45_28913_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>1</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Networking/28679/WirelessLan_DCH_ROG_Intel_B_V22.150.0.3_28679_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>2</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Chipset/28886/INFUpdate_DCH_ROG_Intel_B_V10.1.36.7_28886_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>3</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Chipset/25903/VMD_ROG_Intel_B_V19.1.0.1001_25903.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>4</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Chipset/28889/I2C_ROG_Intel_B_V30.100.2212.4_28889_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>5</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Chipset/28888/GPIO_ROG_Intel_B_V30.100.2212.4_28888_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>6</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Chipset/28894/GNA_ROG_Intel_B_V03.00.00.1457_28894_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>7</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Chipset/28892/DPTF_ROG_Intel_B_V1.0.11000.27915_28892_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>8</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Chipset/28908/MEI_Consumer_ROG_Intel_B_V2220.3.1.0_28908_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>9</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Audio/29631/Audio_DriverOnly_Cmedia_ROG_Cmedia_B_V2.2.1.22_29631_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>10</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Audio/26493/Audio_CmediaCodecConsole_ROG_Cmedia_B_V1.0.11.6_26493_2.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>11</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Graphics/32391/Graphic_DCH_ROG_NVIDIA_B_V31.0.15.2783_32391.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>12</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Graphics/33609/Graphic_ROG_Intel_B_V31.0.101.3962_33609.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>13</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Driver/Bluetooth/28902/Bluetooth_ROG_Intel_B_V22.150.0.6_28902_1.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>14</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/VBIOS/FX517ZC_VBIOS_V6.8.0_0214.zip?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>15</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Software/SoftwareandUtility/14474/DolbyAtmosCMediadriverforROG_TUF_V3.30305.350.1_14474_1.zip?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>16</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Software/SoftwareandUtility/14410/AuraWallpaperService_V1.3.4.0_14410_1.zip?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>17</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Software/SoftwareandUtility/15528/ASUSSystemControlInterfacev3_ASUS_Z_V3.1.22.0_15528_2.exe?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>18</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Software/SoftwareandUtility/14492/ASUSSmartDisplayControl_V2.6.15_14492_1.zip?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>19</Order>
+        <Type>Driver</Type>
+        <URL>https://dlcdnets.asus.com/pub/ASUS/GamingNB/Image/Software/SoftwareandUtility/15352/ArmouryCrate&amp;AuraCreatorInstaller_V3.2.9.1_15352_1_2.zip?model=FX517ZC</URL>
+        <Args>/SILENT /NORESTART</Args>
+      </Script>
+      <Script>
+        <Order>21</Order>
+        <Type>Setup</Type>
+        <URL>C:\Windows\Setup\setup.exe</URL>
+        <Args>-noargs-</Args>
+      </Script>
+    </MainScript>
+  </Scripts>
+</PortableDriver>
