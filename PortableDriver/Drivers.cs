@@ -21,6 +21,7 @@ class globalVariables
 {
     public static string[] results { get; set; }
     public static string MSIUrl { get; set; }
+    public static string VMUrl { get; set;}
 }
 class Drivers
 {
@@ -114,7 +115,7 @@ class Asus
                     return "error";
                 }
             }
-            catch (HttpRequestException e)
+            catch 
             {
                 return "error";
             }

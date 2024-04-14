@@ -12,7 +12,7 @@ namespace PortableDriver
         public string xmlLoc;
         protected string[] arrUrl;
         public Script() { 
-        xmlLoc = Environment.GetFolderPath(Environment.SpecialFolder.System);
+        xmlLoc = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
         public Script(string xmlLoc)
         {

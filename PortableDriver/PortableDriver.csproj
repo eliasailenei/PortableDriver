@@ -144,6 +144,12 @@
     <Compile Include="Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="VM.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="VM.Designer.cs">
+      <DependentUpon>VM.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -174,6 +180,9 @@
     </Compile>
     <EmbeddedResource Include="Settings.resx">
       <DependentUpon>Settings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VM.resx">
+      <DependentUpon>VM.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.manifest" />
     <None Include="packages.config" />

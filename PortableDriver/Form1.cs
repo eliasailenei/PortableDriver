@@ -13,6 +13,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime;
 
 namespace PortableDriver
 {
@@ -39,7 +40,7 @@ namespace PortableDriver
         [return: MarshalAs(UnmanagedType.Bool)]
 
         public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
-        public bool port, init, userDetermined, selector;
+        public bool port, init, userDetermined, selector, isVM;
         Drivers drivers = new Drivers();
         private Rectangle richb1, richb2, richb3,checb1, bttn1, bttn2, bttn3, bttn4, bttn5;
         private Size form;
@@ -48,7 +49,7 @@ namespace PortableDriver
         string[] deviceInfo;
         char tLetter;
         string inpt;
-        List<Tuple<string, string, string>> input;
+        List<Tuple<string, string, string>> input = new List<Tuple<string, string, string>>();
         private List<string> downUrl = new List<string>();
         private List<string> downPort = new List<string>();
         public Form1(bool fs)
@@ -91,9 +92,9 @@ namespace PortableDriver
         {
             // Due to UI conflict, Ive decieded to not use this method.
         }
-        private async Task load()
+        private async Task load(object sender, EventArgs e)
         {
-            if (deviceInfo[0].ToLower().Contains("asus"))
+            if (deviceInfo[0].ToLower().Contains("asus") || deviceInfo[0].ToLower().Contains("asustek"))
             {
                 Console.WriteLine("ASUS detected!");
                 await asusLoad();
@@ -126,13 +127,48 @@ namespace PortableDriver
                 {
                     await MSILoad(await msi.getDatas(pls));
                 }
+            } else if (deviceInfo[0].ToLower().Contains("qemu"))
+            {
+                input.Add(Tuple.Create("qemudriver", "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win-guest-tools.exe", "unknown version"));
+                checkedListBox1.Items.Add("QEMU VirtIO Driver, latest");
+                checkedListBox1.SetItemChecked(0, true);
+            } else if (deviceInfo[0].ToLower().Contains("virtualbox") || deviceInfo[0].ToLower().Contains("vmware") && port)
+            {
+                string vmclient = string.Empty;
+                if (deviceInfo[0].ToLower().Contains("virtualbox"))
+                {
+                    vmclient = "virtualbox";
+                } else if (deviceInfo[0].ToLower().Contains("vmware"))
+                {
+                    vmclient = "vmware";
+                }
+                VM showDiag = new VM();
+                showDiag.vmtype = vmclient;
+                showDiag.Location = new Point((this.ClientSize.Width - showDiag.Width) / 2,
+                                          (this.ClientSize.Height - showDiag.Height) / 2);
+                this.Controls.Add(showDiag);
+                showDiag.BringToFront();
+                showDiag.Show();
+                showDiag.InteractionComplete += async (s, args) =>
+                {
+                    if (showDiag.useOEM)
+                    {
+                        globalVariables.results[0] = "na";
+                        await load(sender,e);
+                    }
+                    else
+                    {
+                        downPort.Add(globalVariables.VMUrl);
+                        isVM = true;
+                        button2_Click(sender, e);
+                    }
+                };
             }
             else
             {
                 NotFound showDiag = new NotFound();
-                int centerX = (Screen.PrimaryScreen.Bounds.Width - showDiag.Width) / 2;
-                int centerY = (Screen.PrimaryScreen.Bounds.Height - showDiag.Height) / 2;
-                showDiag.Location = new Point(centerX, centerY);
+                showDiag.Location = new Point((this.ClientSize.Width - showDiag.Width) / 2,
+                                          (this.ClientSize.Height - showDiag.Height) / 2);
                 this.Controls.Add(showDiag);
                 showDiag.BringToFront();
                 showDiag.Show();
@@ -141,7 +177,7 @@ namespace PortableDriver
                     userDetermined = true;
                     inpt = showDiag.info;
                     deviceInfo[0] = showDiag.manu;
-                    await load();
+                    await load(sender, e);
                 };
             }
         }
@@ -247,6 +283,8 @@ namespace PortableDriver
             }
         }
 
+      
+
         private void button5_Click(object sender, EventArgs e)
         {
             try
@@ -304,7 +342,7 @@ namespace PortableDriver
             {
                 checkedListBox1.SetItemChecked(i, false); 
            }
-            await load();
+            await load(sender,e);
             Cursor.Current = Cursors.Arrow;
 
         }
@@ -353,41 +391,46 @@ namespace PortableDriver
 
                 foreach (string item in downPort)
                 {
-                    if (deviceInfo[0].ToLower().Contains("asus"))
+                    if (isVM)
                     {
-                        string modifiedItem = "DOWNLOAD" + item;
-                        int commaIndex = modifiedItem.IndexOf(',');
-                        string updatedItem = commaIndex != -1 ? modifiedItem.Substring(0, commaIndex) : modifiedItem;
-                        foreach (var main in input)
-                        {
-                            if (main.Item1 == updatedItem)
-                            {
-                                urls[pointer] = main.Item2; 
-                                pointer++;
-                                break;
-                            }
-                        }
+                        urls[pointer] = item;
+                        pointer++;
                     }
                     else
                     {
-                        foreach (var main in input)
+                        if (deviceInfo[0].ToLower().Contains("asus"))
                         {
-                            if (main.Item1 == item)
+                            string modifiedItem = "DOWNLOAD" + item;
+                            int commaIndex = modifiedItem.IndexOf(',');
+                            string updatedItem = commaIndex != -1 ? modifiedItem.Substring(0, commaIndex) : modifiedItem;
+                            foreach (var main in input)
                             {
-                                urls[pointer] = main.Item2; 
-                                pointer++;
+                                if (main.Item1 == updatedItem)
+                                {
+                                    urls[pointer] = main.Item2;
+                                    pointer++;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+
+                            foreach (var main in input)
+                            {
+                                if (main.Item1 == item)
+                                {
+                                    urls[pointer] = main.Item2;
+                                    pointer++;
+                                }
                             }
                         }
                     }
-                
-
-                
                 }
                 PreDownload showDiag = new PreDownload();
                 showDiag.urlList = urls;
-                int centerX = (Screen.PrimaryScreen.Bounds.Width - showDiag.Width) / 2;
-                int centerY = (Screen.PrimaryScreen.Bounds.Height - showDiag.Height) / 2;
-                showDiag.Location = new Point(centerX, centerY);
+                showDiag.Location = new Point((this.ClientSize.Width - showDiag.Width) / 2,
+                                          (this.ClientSize.Height - showDiag.Height) / 2);
                 this.Controls.Add(showDiag);
                 showDiag.BringToFront();
                 showDiag.Show();
@@ -403,6 +446,7 @@ namespace PortableDriver
                             points++;
                         }
                     }
+                   
                     xML.addToXML(points + 1, "Setup", "C:\\Windows\\Setup\\Scripts\\autorun.exe", "autorun.au3");
                     xML.compileScript();
                     button5_Click(sender, e);
@@ -420,9 +464,9 @@ namespace PortableDriver
                         point++;
                     }
                 }
-                xML.addToXML(point + 1, "Setup", "C:\\Windows\\Setup\\setup.exe", "-noargs-");
                 xML.compileScript();
                 Installer inst = new Installer(xML.getXmlLoc());
+                this.Hide();
                 inst.Show();
             }
             
@@ -465,7 +509,7 @@ namespace PortableDriver
             resizeControl(richb2, richTextBox2);
             resizeControl(richb3, richTextBox3);
         }
-        private void Form1_Shown(object sender, EventArgs e)
+        private async void Form1_Shown(object sender, EventArgs e)
         {
             if (port)
             {
@@ -485,24 +529,23 @@ namespace PortableDriver
             if (!Directory.Exists("drivers"))
             {
                 GettingDrivers showDiag = new GettingDrivers();
-                int centerX = (Screen.PrimaryScreen.Bounds.Width - showDiag.Width) / 2;
-                int centerY = (Screen.PrimaryScreen.Bounds.Height - showDiag.Height) / 2;
-                showDiag.Location = new Point(centerX, centerY);
+                showDiag.Location = new Point((this.ClientSize.Width - showDiag.Width) / 2,
+                                          (this.ClientSize.Height - showDiag.Height) / 2);
                 this.Controls.Add(showDiag);
                 showDiag.BringToFront();
                 showDiag.Show();
-                showDiag.InteractionComplete += (s, args) =>
+                showDiag.InteractionComplete += async (s, args) =>
                 {
-                   propLoad();
+                  await propLoad(sender,e);
                 };
             }
             else
             {
-                propLoad();
+               await propLoad(sender,e);
             }
             
         }
-        private async Task propLoad()
+        private async Task propLoad(object sender, EventArgs e)
         {
             richTextBox2.BeginInvoke((Action)(() => richTextBox2.AppendText("Please wait, we are loading your drivers now.")));
 
@@ -516,8 +559,8 @@ namespace PortableDriver
                 richTextBox1.BeginInvoke((Action)(() => richTextBox1.AppendText($"{alsoDisplay[temp]} {info}\n")));
                 point++;
             }
-
-            await load();
+            deviceInfo[0] = "virtualbox";
+            await load(sender,e);
 
             richTextBox2.BeginInvoke((Action)(() =>
             {

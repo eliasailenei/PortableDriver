@@ -14,6 +14,8 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Net.NetworkInformation;
 using System.Security.Policy;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Text.RegularExpressions;
 
 namespace PortableDriver
 {
@@ -28,61 +30,55 @@ namespace PortableDriver
 
         public Installer(string accXml)
         {
-            InitializeComponent();
-            if (Directory.Exists(accXml))
-            {
-                xmlPath = accXml;
+
+            if (Directory.Exists(Path.Combine(accXml, "preDownloaded")))
+             {
+                isPre = true;
+                downloc = accXml + "\\PreDownloaded";
+                InitializeComponent();
+                findDriver();
             } else
             {
-                MessageBox.Show("Invalid script. Try again!");
-                this.Close();
+                InitializeComponent();
+                if (Directory.Exists(accXml))
+                {
+                    xmlPath = accXml;
+                }
+                else
+                {
+                    MessageBox.Show("Invalid script. Try again!");
+                    this.Close();
+                }
             }
+           
             
         }
         public Installer()
         {
-            InitializeComponent();
-        }
-        private async void Installer_Load(object sender, EventArgs e)
-        {
-            string[] placehold = { "n/a" };
             if (Directory.Exists(xmlPath + "\\PreDownloaded"))
             {
                 isPre = true;
                 downloc = xmlPath + "\\PreDownloaded";
+                InitializeComponent();
                 findDriver();
                 installDrivers();
-              Directory.Delete(downloc, true);
-                Application.Restart();
-                return;
-            }
-
-            if (internetStatus())
-            {
-                await loadXML();
-                pictureBox1.Hide();
-                label1.Visible = false;
-                showAll(true);
-                await startDown(xmlPath + "\\DriverSetup\\", false, placehold);
-                foreach (var item in found)
-                {
-                    if (item.Item2 == "Setup")
-                    {
-                        string app = item.Item3;
-                        string args = item.Item4;
-                        niniteInstall(app, args);
-                        break;
-                    }
-                }
+               Directory.Delete(downloc, true);
+                Environment.Exit(0);
             }
             else
             {
-                label1.Text = "No internet, please try again";
-                showAll(false);
-            }
+                if (File.Exists("C:\\donotreopen.txt"))
+                {
+                    File.Delete("C:\\donotreopen.txt");
+                }
+                File.WriteAllText("C:\\donotreopen.txt", "donotreopen");
 
-            this.Close();
+                xmlPath = Directory.GetCurrentDirectory();
+                InitializeComponent();
+            }
+            
         }
+        
 
         private void showAll(bool inp)
         {
@@ -166,7 +162,7 @@ namespace PortableDriver
                     string fileName = Path.GetFileName(url);
                     string fileExtension = fileExt(url);
 
-                    if (fileExtension.Equals(".exe", StringComparison.OrdinalIgnoreCase) || fileExtension.Equals(".zip", StringComparison.OrdinalIgnoreCase))
+                    if (fileExtension.Equals(".exe", StringComparison.OrdinalIgnoreCase) || fileExtension.Equals(".zip", StringComparison.OrdinalIgnoreCase) || fileExtension.Equals(".iso", StringComparison.OrdinalIgnoreCase))
                     {
                         ext = fileExtension;
 
@@ -205,14 +201,28 @@ namespace PortableDriver
         }
         private async void niniteInstall(string apps, string argss)
         {
-            await Task.Run(() =>
+            try
             {
-                pictureBox2.BeginInvoke(new Action(() => { pictureBox2.Visible = false; }));
-                pictureBox4.BeginInvoke(new Action(() => { pictureBox4.Visible = false; }));
-                pictureBox3.BeginInvoke(new Action(() => { pictureBox3.Visible = true; }));
-                string folderPath = Path.GetDirectoryName(apps);
-                Process.Start(apps, folderPath + "\\" +argss);
-            });
+                await Task.Run(() =>
+                {
+                    pictureBox2.BeginInvoke(new Action(() => { pictureBox2.Visible = false; }));
+                    pictureBox4.BeginInvoke(new Action(() => { pictureBox4.Visible = false; }));
+                    pictureBox3.BeginInvoke(new Action(() => { pictureBox3.Visible = true; }));
+                    string folderPath = Path.GetDirectoryName(apps);
+                    if (Directory.Exists(folderPath))
+                    {
+                        Process.Start(apps, folderPath + "\\" + argss);
+                    } else
+                    {
+                        MessageBox.Show("Error: non-existing folder!\n\nThis is mainly caused by a wrong folder, please change the folder location in modify details to a real folder.");
+
+                    }
+                });
+            } catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message + "\n\nThis is mainly caused by a wrong folder, please change the folder location in modify details to a real folder.");
+            }
+            
         }
         private void UpdateLabel(string text)
         {
@@ -232,6 +242,10 @@ namespace PortableDriver
                 return ".exe";
             } else if (inp.Contains(".zip")) {
                 return ".zip";
+            }
+            else if (inp.Contains(".iso"))
+            {
+                return ".iso";
             }
             return "unsupported";
         }
@@ -271,10 +285,69 @@ namespace PortableDriver
                 }
             }
         }
+
+        private async void Installer_Shown(object sender, EventArgs e)
+        {
+
+            if (isPre)
+            {
+                showAll(false);
+
+                installDrivers();
+              Directory.Delete(downloc, true);
+                Environment.Exit(0);
+            }
+            else
+            {
+                if (File.Exists("C:\\donotreopen.txt"))
+                {
+                    File.Delete("C:\\donotreopen.txt");
+                }
+                File.WriteAllText("C:\\donotreopen.txt", "donotreopen");
+                string[] placehold = { "n/a" };
+                while (!internetStatus())
+                {
+                    showAll(false);
+                    var message = MessageBox.Show("No internet found, do you want to close this?\n\nClick yes if you are in the POST setup and you already have the internet drivers.", "WARNING", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (message == DialogResult.Yes)
+                    {
+                        Environment.Exit(0);
+                    }
+                }
+                if (internetStatus())
+                {
+                    await loadXML();
+                    pictureBox1.Hide();
+                    label1.Visible = false;
+                    showAll(true);
+                    await startDown(xmlPath + "\\DriverSetup\\", false, placehold);
+                    foreach (var item in found)
+                    {
+                        if (item.Item2 == "Setup")
+                        {
+                            string app = item.Item3;
+                            string args = item.Item4;
+                            niniteInstall(app, args);
+                            break;
+                        }
+                    }
+                    File.Delete("C:\\donotreopen.txt");
+                }
+                else
+                {
+                    label1.Text = "No internet, please try again";
+                    showAll(false);
+                }
+
+                this.Close();
+            }
+        }
+
         public void findDriver()
         {
             string[] allFiles = Directory.GetFiles(downloc);
             List<string> allZip = new List<string>();
+            List<string> allISO = new List<string>();
             foreach (string file in allFiles)
             {
                 if (file.Contains(".exe"))
@@ -283,8 +356,51 @@ namespace PortableDriver
                 } else if (file.Contains(".zip")){
                     allZip.Add(file);
                 }
+                else if (file.Contains(".iso"))
+                {
+                    allISO.Add(file);
+                }
             }
             ZipInstall(allZip);
+            ISOExtract(allISO);
+        }
+        private void ISOExtract(List<string> allISO)
+        {
+            try
+            {
+                string extractPath = string.Empty;
+                if (allISO.Count > 0)
+                {
+                    foreach (string file in allISO)
+                    {
+                         extractPath = Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file));
+                        Directory.CreateDirectory(extractPath);
+                        using (Process process = new Process())
+                        {
+                            process.StartInfo.FileName = "7-Zip\\7z.exe";
+                            process.StartInfo.Arguments = @"x -o" + extractPath + " " + file + " -bd -bsp1 -bso1";
+                            process.StartInfo.UseShellExecute = false;
+                            process.StartInfo.CreateNoWindow = true;
+                            process.Start();
+                            process.WaitForExit();
+
+                        }
+                    }
+                    string[] files = Directory.GetFiles(extractPath, "*.exe");
+                    foreach (string file in files)
+                    {
+                        if (file.Contains("setup") || file.Contains("Additions"))
+                        {
+                            downlFile.Add(file);
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+
         }
         private void ZipInstall(List<string> allZip)
         {
@@ -303,15 +419,15 @@ namespace PortableDriver
                         }
                         catch (IOException ex)
                         {
-                            // Handle IOException caused by file being used by another process
+                        
                             Console.WriteLine($"Error extracting ZIP file: {ex.Message}");
-                            continue; // Skip to the next iteration
+                            continue; 
                         }
                         catch (UnauthorizedAccessException ex)
                         {
-                            // Handle UnauthorizedAccessException caused by lack of permission
+                            
                             Console.WriteLine($"Error extracting ZIP file: {ex.Message}");
-                            continue; // Skip to the next iteration
+                            continue; 
                         }
                     }
                     ZipFileInstall(downloc, true);
@@ -415,6 +531,7 @@ namespace PortableDriver
                 {
                     Console.WriteLine("Error is ignored");
                     errorOccurred = true;
+                    continue;
                 }
             }
             if (isPre)

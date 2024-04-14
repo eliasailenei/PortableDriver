@@ -38,22 +38,27 @@ namespace PortableDriver
             Directory.CreateDirectory("PreDownloaded");
             foreach (var item in urlList)
             {
-                try
-                {
-                    using (var client = new WebClient())
+               if (fileExt(item) != "unsupported")
                     {
-                        client.DownloadFile(item, $"PreDownloaded\\driver{pointer}{fileExt(item)}");
-                    } 
-                } catch
-                {
-                    Console.WriteLine("Skipping");
-                }
-                finally
-                {
-                    pointer++;
-                    progressBar1.BeginInvoke((Action)(() => progressBar1.Value = pointer));
-                    label1.BeginInvoke((Action)(() => label1.Text = $"Downloading {pointer}/{urlList.Length + 1}"));  
-                }
+                        try
+                        {
+                            using (var client = new WebClient())
+                            {
+                                client.DownloadFile(item, $"PreDownloaded\\driver{pointer}{fileExt(item)}");
+                            }
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Skipping");
+                        }
+                        finally
+                        {
+                            pointer++;
+                            progressBar1.BeginInvoke((Action)(() => progressBar1.Value = pointer));
+                            label1.BeginInvoke((Action)(() => label1.Text = $"Downloading {pointer}/{urlList.Length + 1}"));
+                        }
+                    }
+                
             }
                 this.Invoke((Action)(() =>
                 {
@@ -78,6 +83,10 @@ namespace PortableDriver
                 else if (inp.Contains(".zip"))
                 {
                     return ".zip";
+                }
+                else if (inp.Contains(".iso"))
+                {
+                    return ".iso";
                 }
             }
             catch (NullReferenceException)
