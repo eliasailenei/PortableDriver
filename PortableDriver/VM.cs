@@ -111,7 +111,7 @@ namespace PortableDriver
                     catch (Exception ex)
                     {
                         button2.Enabled = true;
-                        MessageBox.Show("Sorry, you can't use that! Error: " + ex.Message);
+                        MessageBox.Show("Sorry, you can't use that!! Error: " + ex.Message);
                     }
                 }
             }
