@@ -4,6 +4,7 @@
     <StartArguments>--installer C:\Users\remus\Source\Repos\PortableDriverRepo\PortableDriver\bin\x64\Debug</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <StartArguments>--installer C:\Users\remus\source\repos\PortableDriverRepo\PortableDriver\bin\x64\Debug</StartArguments>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
 </Project>

@@ -26,7 +26,7 @@ namespace PortableDriver
             foreach (string s in inp)
             {
                 if (s.Contains("Laptop") || s.Contains("Desktop") || s.Contains("Motherboard")){
-                    Match match = Regex.Match(s, @"/([^/]+)$");
+                    Match match = Regex.Match(s, @"/([^/]+)$"); //regex
                     if (match.Success)
                     {
                         string result = match.Groups[1].Value;

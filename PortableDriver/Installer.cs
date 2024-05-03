@@ -114,7 +114,7 @@ namespace PortableDriver
             {
                 try
                 {
-                    xmlDoc.Load(xmlPath + "\\autoDriver.xml");
+                    xmlDoc.Load(xmlPath + "\\autoDriver.xml"); // writing and reading a file
 
                     XmlNodeList scriptNodes = xmlDoc.SelectNodes("//Script");
 
@@ -172,7 +172,7 @@ namespace PortableDriver
                             {
                                 string encodedUrl = Uri.EscapeUriString(url);
                                 HttpResponseMessage response = client.GetAsync(encodedUrl).Result;
-                                Task.Run(async () => await ESDDownload(response, $"driver{pointer}{fileExtension}")).Wait();
+                                Task.Run(async () => await ESDDownload(response, $"driver{pointer}{fileExtension}")).Wait(); // recursive algo
                             }
                             catch
                             {
@@ -187,14 +187,14 @@ namespace PortableDriver
                     pointer++;
                     if (!isPort)
                     {
-                        UpdateLabel($"Downloaded {pointer}/{found.Count}");
+                        UpdateLabel($"Downloaded {pointer}/{found.Count}"); // recursive algo
                     }
                     
                 }
                 if (!isPort)
                 {
-                    findDriver();
-                    installDrivers();
+                    findDriver(); // recursive algo
+                    installDrivers();// recursive algo
                 }
                 
             });
@@ -235,7 +235,7 @@ namespace PortableDriver
                 label6.Text = text;
             }
         }
-        private string fileExt(string inp)
+        private string fileExt(string inp) // recursive algo
         {
             if (inp.Contains(".exe"))
             {
@@ -249,7 +249,7 @@ namespace PortableDriver
             }
             return "unsupported";
         }
-       private async Task ESDDownload(HttpResponseMessage response, string progressFileName)
+       private async Task ESDDownload(HttpResponseMessage response, string progressFileName) // recursive algo
         {
             if (response.IsSuccessStatusCode)
             {
@@ -346,8 +346,8 @@ namespace PortableDriver
         public void findDriver()
         {
             string[] allFiles = Directory.GetFiles(downloc);
-            List<string> allZip = new List<string>();
-            List<string> allISO = new List<string>();
+            List<string> allZip = new List<string>(); // list operation
+            List<string> allISO = new List<string>();// list operation
             foreach (string file in allFiles)
             {
                 if (file.Contains(".exe"))
@@ -364,7 +364,13 @@ namespace PortableDriver
             ZipInstall(allZip);
             ISOExtract(allISO);
         }
-        private void ISOExtract(List<string> allISO)
+
+        private void Installer_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ISOExtract(List<string> allISO) // recursive algo
         {
             try
             {
@@ -402,7 +408,7 @@ namespace PortableDriver
             }
 
         }
-        private void ZipInstall(List<string> allZip)
+        private void ZipInstall(List<string> allZip) // recursive algo
         {
             try
             {
@@ -439,7 +445,7 @@ namespace PortableDriver
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
-        private void ZipFileInstall(string directoryPath, bool firstTime)
+        private void ZipFileInstall(string directoryPath, bool firstTime) // recursive algo
         {
             try
             {

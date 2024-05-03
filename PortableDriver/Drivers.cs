@@ -85,7 +85,7 @@ class Drivers
 
 
 }
-class Asus
+class Asus // simple oop
 {
     public string product;
     public Asus()
@@ -103,7 +103,7 @@ class Asus
         {
             try
             {
-                HttpResponseMessage response = await client.GetAsync("https://www.asus.com/support/api/product.asmx/GetPDSupportTab?website=global&pdid=&pdhashedid=&model=" + removeDot(product));
+                HttpResponseMessage response = await client.GetAsync("https://www.asus.com/support/api/product.asmx/GetPDSupportTab?website=global&pdid=&pdhashedid=&model=" + removeDot(product)); // calling API for JSON
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -150,14 +150,14 @@ class Asus
         }
         return null;
     }
-    private string removeDot(string input)
+    private string removeDot(string input) // recursive algo
     {
-        Regex regex = new Regex(@"\.\d+");
+        Regex regex = new Regex(@"\.\d+"); //regex
         return regex.Replace(input, "");
     }
     public async Task<List<Tuple<string, string, string>>> scrapeURL()
     {
-        List<Tuple<string, string, string>> input = new List<Tuple<string, string, string>>();
+        List<Tuple<string, string, string>> input = new List<Tuple<string, string, string>>(); //list system
         var driverService = FirefoxDriverService.CreateDefaultService(@"drivers\geckodriver.exe");
         driverService.HideCommandPromptWindow = true;
         driverService.BrowserCommunicationPort = 26877;
@@ -196,7 +196,7 @@ class Asus
     }
     public string getVersion(string url)
     {
-        string pattern = @"V([\d.]+)_";
+        string pattern = @"V([\d.]+)_"; //regex
         Match match = Regex.Match(url, pattern);
 
         if (match.Success)
@@ -217,8 +217,8 @@ class MSI
     
      public string model { get; set; }
     
-    List<string> results = new List<string>();
-    private string addDash(string input)
+    List<string> results = new List<string>(); // list system
+    private string addDash(string input) // recussive algo
     {
         return input.Replace(" ", "-");
     }
@@ -298,7 +298,6 @@ class MSI
     public async Task<List<Tuple<string, string, string>>> getDatas(string url)
     {
         string accUrl = url + "/support#driver";
-        // use real oop
         List<Tuple<string, string, string>> results = new List<Tuple<string, string, string>>();
         var driverService = FirefoxDriverService.CreateDefaultService(@"drivers\geckodriver.exe");
         driverService.HideCommandPromptWindow = true;

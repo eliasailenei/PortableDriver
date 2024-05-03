@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace PortableDriver
 {
@@ -21,8 +22,9 @@ namespace PortableDriver
 
         private void NotFound_Load(object sender, EventArgs e)
         { 
-            string[] supportManu = { "Exit program","ASUS", "MSI" };
+            string[] supportManu = { "Exit program","ASUS", "MSI" , "VirtualBox" , "VMWare", "QEMU"};
             comboBox1.Items.AddRange(supportManu);
+            comboBox1.SelectedItem = comboBox1.Items[1];
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -52,10 +54,33 @@ namespace PortableDriver
         public event EventHandler InteractionComplete;
         private void button1_Click(object sender, EventArgs e)
         {
-            manu = comboBox1.SelectedItem.ToString();
-            info = textBox1.Text;
-            InteractionComplete.Invoke(this, EventArgs.Empty);
-            this.Hide();
+            try
+            {
+                if (!string.IsNullOrEmpty(comboBox1.SelectedItem.ToString()))
+                {
+                    string bef = comboBox1.SelectedItem.ToString();
+                    if (bef == "VirtualBox")
+                    {
+                        manu = "innotek";
+                    }
+                    else if (string.IsNullOrEmpty(bef))
+                    {
+                        MessageBox.Show("Please choose an option");
+                    }
+                    else
+                    {
+                        manu = bef;
+                    }
+                    info = textBox1.Text;
+                    InteractionComplete.Invoke(this, EventArgs.Empty);
+                    this.Hide();
+                }
+               
+            } catch
+            {
+                
+            }
+            
         }
     }
 }

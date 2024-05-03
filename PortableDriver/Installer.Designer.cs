@@ -189,7 +189,6 @@
             this.Name = "Installer";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form2";
-//            this.Load += new System.EventHandler(this.Installer_Load);
             this.Shown += new System.EventHandler(this.Installer_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

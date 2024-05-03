@@ -41,17 +41,17 @@ namespace PortableDriver
 
         public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
         public bool port, init, userDetermined, selector, isVM;
-        Drivers drivers = new Drivers();
-        private Rectangle richb1, richb2, richb3,checb1, bttn1, bttn2, bttn3, bttn4, bttn5;
+        Drivers drivers = new Drivers(); // simple oop
+        private Rectangle richb1, richb2, richb3,checb1, bttn1, bttn2, bttn3, bttn4, bttn5, bttn6;
         private Size form;
-        MakeXML xML = new MakeXML();
+        MakeXML xML = new MakeXML(); // simple oop
         string seletetedURL;
         string[] deviceInfo;
         char tLetter;
         string inpt;
-        List<Tuple<string, string, string>> input = new List<Tuple<string, string, string>>();
-        private List<string> downUrl = new List<string>();
-        private List<string> downPort = new List<string>();
+        List<Tuple<string, string, string>> input = new List<Tuple<string, string, string>>(); // list system
+        private List<string> downUrl = new List<string>();// list system
+        private List<string> downPort = new List<string>();// list system
         public Form1(bool fs)
         {
             SetWindowPos(this.Handle, HWND_TOPMOST, 0, 0, 0, 0, TOPMOST_FLAGS);
@@ -87,6 +87,7 @@ namespace PortableDriver
             bttn3 = new Rectangle(button3.Location, button3.Size);
             bttn4 = new Rectangle(button4.Location, button4.Size);
             bttn5 = new Rectangle(button5.Location, button5.Size);
+            bttn6 = new Rectangle(button6.Location, button6.Size);  
         }
         private  void Form1_Load(object sender, EventArgs e)
         {
@@ -101,7 +102,7 @@ namespace PortableDriver
             }
             else if (deviceInfo[0].ToLower().Contains("micro-star") || deviceInfo[0].ToLower().Contains("micro star") || deviceInfo[0].ToLower().Contains("msi"))
             {
-                MSI msi = new MSI();
+                MSI msi = new MSI(); // simple oop
                 if (userDetermined)
                 {
                     msi.itemModel(inpt);
@@ -132,17 +133,17 @@ namespace PortableDriver
                 input.Add(Tuple.Create("qemudriver", "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win-guest-tools.exe", "unknown version"));
                 checkedListBox1.Items.Add("QEMU VirtIO Driver, latest");
                 checkedListBox1.SetItemChecked(0, true);
-            } else if (deviceInfo[0].ToLower().Contains("virtualbox") || deviceInfo[0].ToLower().Contains("vmware") && port)
+            } else if (deviceInfo[0].ToLower().Contains("innotek") || deviceInfo[0].ToLower().Contains("vmware"))
             {
                 string vmclient = string.Empty;
-                if (deviceInfo[0].ToLower().Contains("virtualbox"))
+                if (deviceInfo[0].ToLower().Contains("innotek"))
                 {
                     vmclient = "virtualbox";
                 } else if (deviceInfo[0].ToLower().Contains("vmware"))
                 {
                     vmclient = "vmware";
                 }
-                VM showDiag = new VM();
+                VM showDiag = new VM(); // simple oop
                 showDiag.vmtype = vmclient;
                 showDiag.Location = new Point((this.ClientSize.Width - showDiag.Width) / 2,
                                           (this.ClientSize.Height - showDiag.Height) / 2);
@@ -166,7 +167,13 @@ namespace PortableDriver
             }
             else
             {
-                NotFound showDiag = new NotFound();
+               await showNotFound(sender,e);
+            }
+        }
+        private async Task showNotFound(object sender, EventArgs e)
+        {
+            
+                NotFound showDiag = new NotFound(); // simple oop
                 showDiag.Location = new Point((this.ClientSize.Width - showDiag.Width) / 2,
                                           (this.ClientSize.Height - showDiag.Height) / 2);
                 this.Controls.Add(showDiag);
@@ -179,9 +186,10 @@ namespace PortableDriver
                     deviceInfo[0] = showDiag.manu;
                     await load(sender, e);
                 };
-            }
-        }
+            
 
+            
+        }
         
         private async Task asusLoad()
         {
@@ -205,7 +213,7 @@ namespace PortableDriver
                     latestVersions[title] = href;
                 }
             }
-            List<Tuple<string, string, string>> filteredInput = new List<Tuple<string, string, string>>();
+            List<Tuple<string, string, string>> filteredInput = new List<Tuple<string, string, string>>(); // list system
             foreach (var item in input)
             {
                 string title = noDash(item.Item1);
@@ -264,10 +272,15 @@ namespace PortableDriver
             } catch { return 0; 
             }
         }
-        private string noDash(string input)
+        private string noDash(string input) // recusive algo
         {
             string first = input.Replace("-", "");
             return first.Replace("DOWNLOAD", "");
+        }
+
+        private async void button6_Click(object sender, EventArgs e)
+        {
+           await showNotFound(sender,e);
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -427,7 +440,7 @@ namespace PortableDriver
                         }
                     }
                 }
-                PreDownload showDiag = new PreDownload();
+                PreDownload showDiag = new PreDownload(); // simple oop
                 showDiag.urlList = urls;
                 showDiag.Location = new Point((this.ClientSize.Width - showDiag.Width) / 2,
                                           (this.ClientSize.Height - showDiag.Height) / 2);
@@ -448,7 +461,7 @@ namespace PortableDriver
                     }
                    
                     xML.addToXML(points + 1, "Setup", "C:\\Windows\\Setup\\Scripts\\autorun.exe", "autorun.au3");
-                    xML.compileScript();
+                    xML.compileScript(); // writing and reading a file
                     button5_Click(sender, e);
                 };
 
@@ -465,7 +478,7 @@ namespace PortableDriver
                     }
                 }
                 xML.compileScript();
-                Installer inst = new Installer(xML.getXmlLoc());
+                Installer inst = new Installer(xML.getXmlLoc()); // simple opp
                 this.Hide();
                 inst.Show();
             }
@@ -474,7 +487,7 @@ namespace PortableDriver
 
         private void button3_Click(object sender, EventArgs e)
         {
-            Settings settings = new Settings();
+            Settings settings = new Settings(); // simple oop
             settings.xML = xML;
             this.Controls.Add(settings);
             settings.BringToFront();
@@ -497,7 +510,7 @@ namespace PortableDriver
             c.Size = new Size(newWidth, newHeight);
         }
         
-        private void Rsize(object sender, EventArgs e)
+        private void Rsize(object sender, EventArgs e) // recursive algo
         {
             resizeControl(bttn1, button1);
             resizeControl(bttn2, button2);
@@ -508,6 +521,7 @@ namespace PortableDriver
             resizeControl(richb1, richTextBox1);
             resizeControl(richb2, richTextBox2);
             resizeControl(richb3, richTextBox3);
+            resizeControl(bttn6, button6);
         }
         private async void Form1_Shown(object sender, EventArgs e)
         {
@@ -528,7 +542,7 @@ namespace PortableDriver
             }
             if (!Directory.Exists("drivers"))
             {
-                GettingDrivers showDiag = new GettingDrivers();
+                GettingDrivers showDiag = new GettingDrivers(); // simple oop
                 showDiag.Location = new Point((this.ClientSize.Width - showDiag.Width) / 2,
                                           (this.ClientSize.Height - showDiag.Height) / 2);
                 this.Controls.Add(showDiag);
@@ -559,7 +573,6 @@ namespace PortableDriver
                 richTextBox1.BeginInvoke((Action)(() => richTextBox1.AppendText($"{alsoDisplay[temp]} {info}\n")));
                 point++;
             }
-            deviceInfo[0] = "virtualbox";
             await load(sender,e);
 
             richTextBox2.BeginInvoke((Action)(() =>

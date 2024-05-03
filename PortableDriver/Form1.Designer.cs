@@ -38,6 +38,7 @@ namespace PortableDriver
             this.richTextBox3 = new System.Windows.Forms.RichTextBox();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // checkedListBox1
@@ -107,7 +108,6 @@ namespace PortableDriver
             this.richTextBox3.Size = new System.Drawing.Size(348, 198);
             this.richTextBox3.TabIndex = 7;
             this.richTextBox3.Text = "";
-//            this.richTextBox3.TextChanged += new System.EventHandler(this.richTextBox3_TextChanged);
             // 
             // button4
             // 
@@ -129,12 +129,23 @@ namespace PortableDriver
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(673, 307);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(70, 54);
+            this.button6.TabIndex = 10;
+            this.button6.Text = "Change the system";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(1023, 611);
+            this.Controls.Add(this.button6);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.richTextBox3);
@@ -162,6 +173,7 @@ namespace PortableDriver
         private System.Windows.Forms.RichTextBox richTextBox3;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button6;
     }
 }
 

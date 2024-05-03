@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace PortableDriver
 {
-   public class Script
+   public class Script // simple oop
     {
         public string xmlLoc;
         protected string[] arrUrl;
@@ -30,7 +30,7 @@ namespace PortableDriver
         { return xmlLoc; 
         }    
     }
-    public class Config : Script
+    public class Config : Script //simple oop
     {
         protected string defPath;
         protected bool runSilent, rebootAfter;
@@ -56,7 +56,7 @@ namespace PortableDriver
         public bool getRunSilent() { return runSilent; }
         public bool getRebootAfter() { return rebootAfter;}
     }
-    public class MakeXML : Config
+    public class MakeXML : Config // simple oop
     {
         protected XmlDocument body = new XmlDocument();
         protected XmlElement mainScript;
