@@ -238,7 +238,7 @@ namespace PortableDriver
         private async Task MSILoad(List<Tuple<string, string, string>> inp)
         {
             await Task.Run(() => {
-                input = inp;
+                input = inp; //int
                 int point=0;
                 foreach (var entry in input)
                 {
